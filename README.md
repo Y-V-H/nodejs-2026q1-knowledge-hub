@@ -1,84 +1,65 @@
-# Knowledge Hub
+# Knowledge Hub API
 
-## Prerequisites
+REST API for managing articles, categories, comments and users built with NestJS.
 
-- Git - [Download & Install Git](https://git-scm.com/downloads).
-- Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
+## Requirements
 
-## Downloading
+- Node.js >= 22.14.0
+- npm
 
-```
-git clone {repository URL}
-```
+## Installation
 
-## Installing NPM modules
-
-```
+```bash
 npm install
 ```
 
-## Running application
+## Environment Variables
+
+Create `.env` file in root directory:
 
 ```
+PORT=4000
+```
+
+## Running the app
+
+```bash
 npm start
 ```
 
-After starting the app on port (4000 as default) you can open
-in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
-For more information about OpenAPI/Swagger please visit https://swagger.io/.
+## API Documentation
 
-## Testing
-
-After application running open new terminal and enter:
-
-To run all tests without authorization
+Swagger UI is available at:
 
 ```
-npm run test
+http://localhost:4000/doc
 ```
 
-To run only one of all test suites
+## Endpoints
 
-```
-npm run test -- <path to suite>
-```
+### Users
+- `GET /user` — get all users
+- `POST /user` — create user
+- `GET /user/:id` — get user by id
+- `PUT /user/:id` — update user password
+- `DELETE /user/:id` — delete user
 
-To run all test with authorization
+### Articles
+- `GET /article` — get all articles (supports `?status=`, `?categoryId=`, `?tag=` filters)
+- `POST /article` — create article
+- `GET /article/:id` — get article by id
+- `PUT /article/:id` — update article
+- `DELETE /article/:id` — delete article
 
-```
-npm run test:auth
-```
+### Categories
+- `GET /category` — get all categories
+- `POST /category` — create category
+- `GET /category/:id` — get category by id
+- `PUT /category/:id` — update category
+- `DELETE /category/:id` — delete category
 
-To run only specific test suite with authorization
-
-```
-npm run test:auth -- <path to suite>
-```
-
-To run refresh token tests
-
-```
-npm run test:refresh
-```
-
-To run RBAC (role-based access control) tests
-
-```
-npm run test:rbac
-```
-
-### Auto-fix and format
-
-```
-npm run lint
-```
-
-```
-npm run format
-```
-
-### Debugging in VSCode
-
-Press <kbd>F5</kbd> to debug.
-
-For more information, visit: https://code.visualstudio.com/docs/editor/debugging
+### Comments
+- `GET /comment?articleId={id}` — get comments for article
+- `POST /comment` — create comment
+- `GET /comment/:id` — get comment by id
+- `DELETE /comment/:id` — delete comment
