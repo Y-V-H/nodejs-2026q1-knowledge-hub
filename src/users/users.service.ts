@@ -15,8 +15,8 @@ export class UsersService {
 
   createUser(createUserDto: CreateUserDto): SafeUser {
     const newUser: User = {
-      role: UserRole.VIEWER,
       ...createUserDto,
+      role: createUserDto.role ?? UserRole.VIEWER,
       id: randomUUID(),
       createdAt: Date.now(),
       updatedAt: Date.now(),
