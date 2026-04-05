@@ -8,10 +8,18 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import type { SafeUser, User } from './interfaces/user.interface';
 import { randomUUID } from 'crypto';
 import { UserRole } from './enum/user-role.enum';
+import { ArticleService } from '../articles/article.service';
+import { CommentService } from '../comments/comment.service';
+import { toSafeUser } from './utils/user.utils';
 
 @Injectable()
 export class UsersService {
   private users: User[] = [];
+
+  constructor(
+    private readonly articleService: ArticleService,
+    private readonly commentService: CommentService,
+  ) {}
 
   createUser(createUserDto: CreateUserDto): SafeUser {
     const newUser: User = {
@@ -21,11 +29,10 @@ export class UsersService {
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
-    const { password, ...userWithoutPassword } = newUser;
 
     this.users.push(newUser);
 
-    return userWithoutPassword;
+    return toSafeUser(newUser);
   }
 
   getUser(id: string) {
@@ -33,17 +40,12 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    const { password, ...userWithoutPassword } = user;
 
-    return userWithoutPassword;
+    return toSafeUser(user);
   }
 
   getAllUsers() {
-    const safeUsers = this.users.map((user) => {
-      const { password, ...userWithoutPassword } = user;
-
-      return userWithoutPassword;
-    });
+    const safeUsers = this.users.map((user) => toSafeUser(user));
 
     return safeUsers;
   }
@@ -62,9 +64,8 @@ export class UsersService {
     const user = this.users[index];
     user.password = updateUserDto.newPassword;
     user.updatedAt = Date.now();
-    const { password, ...userWithoutPassword } = user;
 
-    return userWithoutPassword;
+    return toSafeUser(user);
   }
 
   deleteUser(id: string) {
@@ -73,6 +74,8 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
+    this.articleService.nullifyAuthorId(id);
+    this.commentService.deleteCommentsByAuthorId(id);
     this.users.splice(index, 1);
   }
 }

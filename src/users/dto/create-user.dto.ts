@@ -1,4 +1,10 @@
-import { IsString, IsNotEmpty, MinLength, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  MinLength,
+  IsEnum,
+  IsOptional,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from '../enum/user-role.enum';
@@ -10,7 +16,7 @@ export class CreateUserDto {
   })
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) => value.trim())
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   readonly login: string;
 
   @ApiProperty({
@@ -25,7 +31,7 @@ export class CreateUserDto {
     description: 'The user role',
     example: 'admin',
   })
-  @IsString()
+  @IsOptional()
   @IsEnum(UserRole)
-  role?: UserRole;
+  readonly role?: UserRole;
 }
