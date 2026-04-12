@@ -32,6 +32,9 @@ model Article {
   categoryId String?
   comments   Comment[]
   tags       Tag[]
+
+  @@index([status])
+  @@index([categoryId])
 }
 
 model Category {
@@ -43,7 +46,7 @@ model Category {
 
 model Comment {
   id        String   @id @default(uuid())
-  content   String   @unique
+  content   String
   createdAt DateTime @default(now())
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId  String

@@ -170,13 +170,16 @@ async function main() {
   ];
 
   for (const comment of comments) {
-    await prisma.comment.upsert({
+    const existing = await prisma.comment.findFirst({
       where: {
         content: comment.content,
+        articleId: comment.articleId,
       },
-      update: {},
-      create: comment,
     });
+
+    if (!existing) {
+      await prisma.comment.create({ data: comment });
+    }
   }
 }
 main()
