@@ -21,31 +21,35 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Get()
-  getAllCategories(): Category[] {
-    return this.categoryService.getAllCategories();
+  async getAllCategories(): Promise<Category[]> {
+    return await this.categoryService.getAllCategories();
   }
 
   @Get(':id')
-  findCategory(@Param('id', new ParseUUIDPipe()) id: string): Category {
-    return this.categoryService.getCategory(id);
+  async findCategory(
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ): Promise<Category> {
+    return await this.categoryService.getCategory(id);
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
-  ): Category {
-    return this.categoryService.updateCategory(id, updateCategoryDto);
+  ): Promise<Category> {
+    return await this.categoryService.updateCategory(id, updateCategoryDto);
   }
 
   @Post()
-  createCategory(@Body() createCategoryDto: CreateCategoryDto): Category {
-    return this.categoryService.createCategory(createCategoryDto);
+  async createCategory(
+    @Body() createCategoryDto: CreateCategoryDto,
+  ): Promise<Category> {
+    return await this.categoryService.createCategory(createCategoryDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.categoryService.deleteCategory(id);
+  async remove(@Param('id', new ParseUUIDPipe()) id: string) {
+    return await this.categoryService.deleteCategory(id);
   }
 }
