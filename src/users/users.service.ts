@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  ConflictException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -13,11 +14,15 @@ export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createUser(createUserDto: CreateUserDto) {
-    const user = await this.prisma.user.create({
-      data: createUserDto,
-    });
-
-    return toSafeUser(user);
+    try {
+      const user = await this.prisma.user.create({ data: createUserDto });
+      return toSafeUser(user);
+    } catch (e) {
+      if (e.code === 'P2002') {
+        throw new ConflictException('User with this login already exists');
+      }
+      throw e;
+    }
   }
 
   async getUser(id: string) {
@@ -57,6 +62,14 @@ export class UsersService {
   async deleteUser(id: string) {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) throw new NotFoundException('User not found');
-    await this.prisma.user.delete({ where: { id } });
+
+    await this.prisma.$transaction([
+      this.prisma.comment.deleteMany({ where: { authorId: id } }),
+      this.prisma.article.updateMany({
+        where: { authorId: id },
+        data: { authorId: null },
+      }),
+      this.prisma.user.delete({ where: { id } }),
+    ]);
   }
 }
