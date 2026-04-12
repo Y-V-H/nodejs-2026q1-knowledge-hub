@@ -9,6 +9,8 @@ services:
   # Development Service
   # ========================================
   app:
+    environment:
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public"
     build:
       context: .
       dockerfile: ./Dockerfile  # I know it's not necessary, but let's leave it for learning purposes.
