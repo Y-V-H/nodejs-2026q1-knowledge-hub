@@ -21,31 +21,33 @@ export class UserController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  getAllUsers(): SafeUser[] {
-    return this.usersService.getAllUsers();
+  async getAllUsers(): Promise<SafeUser[]> {
+    return await this.usersService.getAllUsers();
   }
 
   @Get(':id')
-  findUser(@Param('id', new ParseUUIDPipe()) id: string): SafeUser {
-    return this.usersService.getUser(id);
+  async findUser(
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ): Promise<SafeUser> {
+    return await this.usersService.getUser(id);
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateUserDto: UpdateUserDto,
-  ): SafeUser {
-    return this.usersService.updateUser(id, updateUserDto);
+  ): Promise<SafeUser> {
+    return await this.usersService.updateUser(id, updateUserDto);
   }
 
   @Post()
-  createUser(@Body() createUserDto: CreateUserDto): SafeUser {
-    return this.usersService.createUser(createUserDto);
+  async createUser(@Body() createUserDto: CreateUserDto): Promise<SafeUser> {
+    return await this.usersService.createUser(createUserDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.usersService.deleteUser(id);
+  async remove(@Param('id', new ParseUUIDPipe()) id: string) {
+    return await this.usersService.deleteUser(id);
   }
 }

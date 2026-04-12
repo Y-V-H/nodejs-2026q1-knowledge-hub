@@ -7,7 +7,7 @@ import {
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { UserRole } from '../enum/user-role.enum';
+import { Role } from '../../../generated/prisma';
 
 export class CreateUserDto {
   @ApiProperty({
@@ -32,6 +32,6 @@ export class CreateUserDto {
     example: 'admin',
   })
   @IsOptional()
-  @IsEnum(UserRole)
-  readonly role?: UserRole;
+  @IsEnum(Role)
+  readonly role?: Role;
 }
