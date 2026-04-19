@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { CategoryService } from './category.services';
+import { CategoryService } from './categories.service';
 import { Category } from './interfaces/category.interfaces';
 import { ApiTags } from '@nestjs/swagger';
 
