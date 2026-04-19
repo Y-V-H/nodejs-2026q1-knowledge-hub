@@ -40,6 +40,10 @@ export class UsersService {
     return users.map(toSafeUser);
   }
 
+  async getAllRawUsers() {
+    return await this.prisma.user.findMany();
+  }
+
   async updateUser(id: string, updateUserDto: UpdateUserDto) {
     const user = await this.prisma.user.findUnique({ where: { id } });
 
