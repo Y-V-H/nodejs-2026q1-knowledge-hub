@@ -7,11 +7,17 @@ REST API for managing articles, categories, comments and users built with NestJS
 - Node.js >= 22.14.0
 - npm
 
-## Installation
+## How to run
 
-```bash
-npm install
-```
+1. Clone the repository
+2. Copy `.env.example` to `.env` and fill in the values
+3. Run `npm install`
+4. Run `npx prisma generate`
+5. Start the database: `docker compose up -d db`
+6. Run migrations: `npx prisma migrate deploy`
+7. Seed the database: `npx prisma db seed`
+8. Start the app: `docker compose up -d`
+9. Open Swagger: `http://localhost:4000/doc`
 
 ## Environment Variables
 
