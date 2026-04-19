@@ -69,3 +69,44 @@ http://localhost:4000/doc
 - `POST /comment` — create comment
 - `GET /comment/:id` — get comment by id
 - `DELETE /comment/:id` — delete comment
+
+
+## Authentication API — curl examples
+Note: Swagger UI may have caching issues with authorization headers. If you notice that database state is not updated after Swagger requests, use the curl commands provided below, they are more reliable for testing.
+### Sign Up
+```bash
+curl -X POST http://localhost:4000/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{"login": "testuser", "password": "secret123"}'
+```
+
+### Login
+```bash
+curl -X POST http://localhost:4000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"login": "testuser", "password": "secret123"}'
+```
+
+### Refresh tokens
+```bash
+curl -X POST http://localhost:4000/auth/refresh \
+  -H "Content-Type: application/json" \
+  -d '{"refreshToken": "<your_refresh_token>"}'
+```
+
+### Logout
+```bash
+curl -X POST http://localhost:4000/auth/logout \
+  -H "Authorization: Bearer <your_access_token>"
+```
+
+### Access protected route (example)
+```bash
+curl http://localhost:4000/user \
+  -H "Authorization: Bearer <your_access_token>"
+```
+
+### Access protected route without token (returns 401)
+```bash
+curl http://localhost:4000/user
+```
