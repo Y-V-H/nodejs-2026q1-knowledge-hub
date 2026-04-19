@@ -40,8 +40,8 @@ export class UsersService {
     return users.map(toSafeUser);
   }
 
-  async getAllRawUsers() {
-    return await this.prisma.user.findMany();
+  async findByLogin(login: string) {
+    return await this.prisma.user.findUnique({ where: { login } });
   }
 
   async updateUser(id: string, updateUserDto: UpdateUserDto) {
@@ -75,5 +75,12 @@ export class UsersService {
       }),
       this.prisma.user.delete({ where: { id } }),
     ]);
+  }
+
+  async updateRefreshToken(id: string, refreshTokenHash: string | null) {
+    return await this.prisma.user.update({
+      where: { id },
+      data: { refreshTokenHash },
+    });
   }
 }

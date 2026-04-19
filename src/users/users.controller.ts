@@ -14,7 +14,11 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 import { SafeUser } from './interfaces/user.interface';
 import { ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'generated/prisma';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @ApiTags('user')
 @Controller('user')
 export class UserController {
@@ -33,6 +37,7 @@ export class UserController {
   }
 
   @Put(':id')
+  @Roles([Role.ADMIN])
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateUserDto: UpdateUserDto,
@@ -41,12 +46,14 @@ export class UserController {
   }
 
   @Post()
+  @Roles([Role.ADMIN])
   async createUser(@Body() createUserDto: CreateUserDto): Promise<SafeUser> {
     return await this.usersService.createUser(createUserDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
+  @Roles([Role.ADMIN])
   async remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return await this.usersService.deleteUser(id);
   }
