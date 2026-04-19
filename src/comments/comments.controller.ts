@@ -10,7 +10,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { CreateCommentDto } from './dto/create-comment.dto';
-import { CommentService } from './comment.service';
+import { CommentService } from './comments.service';
 import { Comment } from './interfaces/comment.interface';
 import { ApiTags } from '@nestjs/swagger';
 
