@@ -5,6 +5,7 @@ import { SignUpDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh.dto';
 import { Public } from './decorators/public.decorator';
+import { Req } from '@nestjs/common';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -29,5 +30,11 @@ export class AuthController {
   @Post('refresh')
   async refresh(@Body() refreshTokenDto: RefreshTokenDto) {
     return this.authService.refresh(refreshTokenDto);
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  async logout(@Req() req: any) {
+    return this.authService.logout(req.user.userId);
   }
 }

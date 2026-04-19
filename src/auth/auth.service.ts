@@ -66,9 +66,7 @@ export class AuthService {
       refreshToken,
       parseInt(this.configService.get<string>('HASH_SALT'), 10),
     );
-    console.log('Saving refreshTokenHash for user:', user.id);
     await this.usersService.updateRefreshToken(user.id, refreshTokenHash);
-    console.log('Done!');
     const normalizedUser = {
       accessToken,
       refreshToken,
@@ -119,5 +117,10 @@ export class AuthService {
     } catch {
       throw new ForbiddenException('Refresh token is invalid or expired');
     }
+  }
+
+  async logout(userId: string) {
+    await this.usersService.updateRefreshToken(userId, null);
+    return { message: 'Logged out successfully' };
   }
 }
