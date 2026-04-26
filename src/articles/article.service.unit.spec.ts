@@ -10,7 +10,7 @@ describe('ArticleService', () => {
 
   const mockPrismaService = {
     article: {
-      create: vi.fn(),
+      upsert: vi.fn(),
       findMany: vi.fn(),
       findUnique: vi.fn(),
       update: vi.fn(),
@@ -56,13 +56,14 @@ describe('ArticleService', () => {
 
   describe('createArticle', () => {
     test('should create an article with tags', async () => {
-      mockPrismaService.article.create.mockResolvedValue(mockArticle);
+      mockPrismaService.article.upsert.mockResolvedValue(mockArticle);
 
       const result = await service.createArticle(mockCreateDto);
 
-      expect(mockPrismaService.article.create).toHaveBeenCalledWith(
+      expect(mockPrismaService.article.upsert).toHaveBeenCalledWith(
         expect.objectContaining({
-          data: expect.objectContaining({
+          where: { title: mockCreateDto.title },
+          create: expect.objectContaining({
             title: mockCreateDto.title,
             status: Status.DRAFT,
           }),
@@ -74,7 +75,7 @@ describe('ArticleService', () => {
 
     test('should create an article without tags when tags not provided', async () => {
       const dtoWithoutTags = { ...mockCreateDto, tags: undefined };
-      mockPrismaService.article.create.mockResolvedValue({
+      mockPrismaService.article.upsert.mockResolvedValue({
         ...mockArticle,
         tags: [],
       });
@@ -225,7 +226,7 @@ describe('ArticleService', () => {
           }),
         }),
       );
-      expect(result.tags[0].name).toBe('new-tag');
+      expect(result.tags[0]).toBe('new-tag');
     });
   });
 

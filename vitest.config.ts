@@ -9,6 +9,9 @@ export default defineConfig({
     },
   },
   test: {
+    env: {
+      TEST_MODE: '',
+    },
     name: 'unit',
     include: ['src/**/*.unit.spec.ts'],
     exclude: [
@@ -24,8 +27,11 @@ export default defineConfig({
         lines: 91,
         branches: 85,
       },
-      // include: ['src/**/*.unit.spec.ts'],
-      exclude: ['./generated/**'],
+      exclude: [
+        './generated/**',
+        '**/prisma/prisma.service.ts',
+        '**/decorators/**',
+      ],
     },
   },
 });

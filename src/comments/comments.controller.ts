@@ -26,7 +26,7 @@ export class CommentController {
 
   @Get()
   async getComments(
-    @Query('articleId', new ParseUUIDPipe()) articleId: string,
+    @Query('articleId', new ParseUUIDPipe()) articleId?: string,
   ): Promise<Comment[]> {
     return await this.commentService.getCommentsByArticleId(articleId);
   }
