@@ -1,11 +1,8 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import type { Comment } from './interfaces/comment.interface';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotFoundError } from 'src/errors';
 
 @Injectable()
 export class CommentService {
@@ -38,14 +35,14 @@ export class CommentService {
 
   async getCommentById(id: string): Promise<Comment> {
     const comment = await this.prisma.comment.findUnique({ where: { id } });
-    if (!comment) throw new NotFoundException('Comment not found');
+    if (!comment) throw new NotFoundError('Comment not found');
     return comment;
   }
 
   async deleteComment(id: string): Promise<void> {
     const comment = await this.prisma.comment.findUnique({ where: { id } });
     if (!comment) {
-      throw new NotFoundException('Comment not found');
+      throw new NotFoundError('Comment not found');
     }
     await this.prisma.comment.delete({ where: { id } });
   }
