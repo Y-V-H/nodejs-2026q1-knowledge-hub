@@ -1,9 +1,5 @@
-import {
-  Injectable,
-  NotFoundException,
-  ForbiddenException,
-  ConflictException,
-} from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
+import { NotFoundError, ForbiddenError } from 'src/errors';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { toSafeUser } from './utils/user.utils';
@@ -28,7 +24,7 @@ export class UsersService {
   async getUser(id: string) {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundError('User not found');
     }
 
     return toSafeUser(user);
@@ -48,11 +44,11 @@ export class UsersService {
     const user = await this.prisma.user.findUnique({ where: { id } });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundError('User not found');
     }
 
     if (user.password !== updateUserDto.oldPassword) {
-      throw new ForbiddenException('Old password is not correct');
+      throw new ForbiddenError('Old password is not correct');
     }
 
     const updatedUser = await this.prisma.user.update({
@@ -65,7 +61,7 @@ export class UsersService {
 
   async deleteUser(id: string) {
     const user = await this.prisma.user.findUnique({ where: { id } });
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) throw new NotFoundError('User not found');
 
     await this.prisma.$transaction([
       this.prisma.comment.deleteMany({ where: { authorId: id } }),
