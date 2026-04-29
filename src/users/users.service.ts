@@ -40,6 +40,10 @@ export class UsersService {
     return users.map(toSafeUser);
   }
 
+  async findByLogin(login: string) {
+    return await this.prisma.user.findUnique({ where: { login } });
+  }
+
   async updateUser(id: string, updateUserDto: UpdateUserDto) {
     const user = await this.prisma.user.findUnique({ where: { id } });
 
@@ -71,5 +75,12 @@ export class UsersService {
       }),
       this.prisma.user.delete({ where: { id } }),
     ]);
+  }
+
+  async updateRefreshToken(id: string, refreshTokenHash: string | null) {
+    return await this.prisma.user.update({
+      where: { id },
+      data: { refreshTokenHash },
+    });
   }
 }

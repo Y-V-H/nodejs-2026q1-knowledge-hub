@@ -11,7 +11,10 @@ import { PrismaService } from '../prisma/prisma.service';
 export class CommentService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createComment(createCommentDto: CreateCommentDto): Promise<Comment> {
+  async createComment(
+    createCommentDto: CreateCommentDto,
+    userId: string,
+  ): Promise<Comment> {
     const article = await this.prisma.article.findUnique({
       where: { id: createCommentDto.articleId },
     });
@@ -23,7 +26,7 @@ export class CommentService {
     return await this.prisma.comment.create({
       data: {
         content: createCommentDto.content,
-        authorId: createCommentDto.authorId,
+        authorId: userId,
         articleId: createCommentDto.articleId,
       },
     });

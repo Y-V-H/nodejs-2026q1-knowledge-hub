@@ -65,8 +65,18 @@ async function main() {
 
   // Users
   const users = [
-    { login: 'admin@prisma.io', password: 'admin', role: Role.ADMIN },
-    { login: 'editor@prisma.io', password: 'editor', role: Role.EDITOR },
+    {
+      login: 'admin@prisma.io',
+      password: 'admin',
+      role: Role.ADMIN,
+      refreshTokenHash: null,
+    },
+    {
+      login: 'editor@prisma.io',
+      password: 'editor',
+      role: Role.EDITOR,
+      refreshTokenHash: null,
+    },
   ];
   const createdUsers = [];
   for (const user of users) {
