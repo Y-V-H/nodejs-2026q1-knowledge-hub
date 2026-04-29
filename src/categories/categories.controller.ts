@@ -11,10 +11,14 @@ import {
 } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { CategoryService } from './category.services';
+import { CategoryService } from './categories.service';
 import { Category } from './interfaces/category.interfaces';
 import { ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'generated/prisma';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @ApiTags('category')
 @Controller('category')
 export class CategoryController {
@@ -33,6 +37,7 @@ export class CategoryController {
   }
 
   @Put(':id')
+  @Roles([Role.ADMIN])
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
@@ -41,6 +46,7 @@ export class CategoryController {
   }
 
   @Post()
+  @Roles([Role.ADMIN])
   async createCategory(
     @Body() createCategoryDto: CreateCategoryDto,
   ): Promise<Category> {
@@ -49,6 +55,7 @@ export class CategoryController {
 
   @Delete(':id')
   @HttpCode(204)
+  @Roles([Role.ADMIN])
   async remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return await this.categoryService.deleteCategory(id);
   }
