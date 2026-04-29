@@ -14,6 +14,14 @@ interface UpdateArticleProps {
   userRole: Role;
 }
 
+const mapArticle = (article: any) => ({
+  ...article,
+  status: article.status.toLowerCase(),
+  tags: article.tags.map((t: any) => t.name),
+  createdAt: new Date(article.createdAt).getTime(),
+  updatedAt: new Date(article.updatedAt).getTime(),
+});
+
 @Injectable()
 export class ArticleService {
   constructor(private readonly prisma: PrismaService) {}
@@ -28,8 +36,10 @@ export class ArticleService {
       authorId,
     } = createArticleDto;
 
-    const article = await this.prisma.article.create({
-      data: {
+    const article = await this.prisma.article.upsert({
+      where: { title },
+      update: { content, status, categoryId, authorId },
+      create: {
         title,
         content,
         status,
@@ -45,7 +55,7 @@ export class ArticleService {
       include: { tags: true },
     });
 
-    return article;
+    return mapArticle(article);
   }
 
   async getAllArticles(
@@ -55,7 +65,7 @@ export class ArticleService {
   ): Promise<Article[]> {
     const where: Prisma.ArticleWhereInput = {};
 
-    if (status) where.status = status as Status;
+    if (status) where.status = status.toUpperCase() as Status;
     if (categoryId) where.categoryId = categoryId;
     if (tag) where.tags = { some: { name: tag } };
 
@@ -64,7 +74,7 @@ export class ArticleService {
       include: { tags: true },
     });
 
-    return articles;
+    return articles.map(mapArticle);
   }
 
   async getArticle(id: string) {
@@ -76,7 +86,7 @@ export class ArticleService {
       throw new NotFoundError('Article not found');
     }
 
-    return article;
+    return mapArticle(article);
   }
 
   async updateArticle({
@@ -97,26 +107,28 @@ export class ArticleService {
     const { tags, title, content, status, categoryId, authorId } =
       updateArticleDto;
 
-    return await this.prisma.article.update({
-      where: { id },
-      data: {
-        title,
-        content,
-        status,
-        categoryId,
-        authorId,
-        tags: tags
-          ? {
-              set: [],
-              connectOrCreate: tags.map((name) => ({
-                where: { name },
-                create: { name },
-              })),
-            }
-          : undefined,
-      },
-      include: { tags: true },
-    });
+    return mapArticle(
+      await this.prisma.article.update({
+        where: { id },
+        data: {
+          title,
+          content,
+          status,
+          categoryId,
+          authorId,
+          tags: tags
+            ? {
+                set: [],
+                connectOrCreate: tags.map((name) => ({
+                  where: { name },
+                  create: { name },
+                })),
+              }
+            : undefined,
+        },
+        include: { tags: true },
+      }),
+    );
   }
 
   async deleteArticle(id: string) {

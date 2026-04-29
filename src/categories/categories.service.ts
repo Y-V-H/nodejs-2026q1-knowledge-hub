@@ -12,11 +12,11 @@ export class CategoryService {
   async createCategory(
     createCategoryDto: CreateCategoryDto,
   ): Promise<Category> {
-    const category = await this.prisma.category.create({
-      data: createCategoryDto,
+    return await this.prisma.category.upsert({
+      where: { name: createCategoryDto.name },
+      update: {},
+      create: createCategoryDto,
     });
-
-    return category;
   }
 
   async getAllCategories(): Promise<Category[]> {
@@ -51,6 +51,11 @@ export class CategoryService {
     if (!category) {
       throw new NotFoundError('Category not found');
     }
+
+    await this.prisma.article.updateMany({
+      where: { categoryId: id },
+      data: { categoryId: null },
+    });
 
     await this.prisma.category.delete({ where: { id } });
   }
