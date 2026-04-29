@@ -1,12 +1,12 @@
-import { UserRole } from '../enum/user-role.enum';
+import { Role } from 'generated/prisma';
 
 export interface User {
   id: string;
   login: string;
   password: string;
-  role: UserRole;
-  createdAt: number;
-  updatedAt: number;
+  role: Role;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface SafeUser extends Omit<User, 'password'> {}
