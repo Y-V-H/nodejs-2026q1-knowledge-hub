@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { ArticleStatus } from '../enum/article-status.enum';
+import { Status } from '../../../generated/prisma';
 
 export class CreateArticleDto {
   @ApiProperty({
@@ -31,14 +31,14 @@ export class CreateArticleDto {
 
   @ApiProperty({
     description: 'Current publication status of the article',
-    example: ArticleStatus.PUBLISHED,
-    enum: ArticleStatus,
-    default: ArticleStatus.DRAFT,
+    example: Status.PUBLISHED,
+    enum: Status,
+    default: Status.DRAFT,
     required: false,
   })
   @IsOptional()
-  @IsEnum(ArticleStatus)
-  readonly status?: ArticleStatus;
+  @IsEnum(Status)
+  readonly status?: Status;
 
   @ApiProperty({
     description: 'Unique identifier of the associated category',

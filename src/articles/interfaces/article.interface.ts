@@ -1,13 +1,14 @@
-import { ArticleStatus } from '../enum/article-status.enum';
+import { Status } from '../../../generated/prisma';
+import { Tag } from '../../../generated/prisma';
 
 export interface Article {
   id: string; // uuid
   title: string;
   content: string;
-  status: ArticleStatus;
+  status: Status;
   authorId?: string | null;
   categoryId?: string | null; // uuid
-  tags: string[];
-  createdAt: number;
-  updatedAt: number;
+  tags: Tag[];
+  createdAt: Date;
+  updatedAt: Date;
 }
