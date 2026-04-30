@@ -83,10 +83,7 @@ export class AuthService {
           message: `Account already exists for ${login}`,
         };
       }
-      throw new ValidationError('Something bad happened', {
-        cause: new Error(),
-        description: `${login} exist`,
-      });
+      throw new ValidationError('Something bad happened');
     }
 
     const salt = parseInt(this.configService.get<string>('HASH_SALT'), 10);

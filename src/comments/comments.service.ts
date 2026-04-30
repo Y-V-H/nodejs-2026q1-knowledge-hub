@@ -48,10 +48,8 @@ export class CommentService {
 
   async getCommentById(id: string): Promise<Comment> {
     const comment = await this.prisma.comment.findUnique({ where: { id } });
-    if (!comment) throw new NotFoundException('Comment not found');
-    return mapComment(comment);
     if (!comment) throw new NotFoundError('Comment not found');
-    return comment;
+    return mapComment(comment);
   }
 
   async deleteComment(id: string): Promise<void> {
