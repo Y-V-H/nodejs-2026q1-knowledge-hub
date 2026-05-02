@@ -1,8 +1,8 @@
-import { SummarizeArticleRequest } from '../interfaces/ai.interface';
+import { SummaryLength } from '../interfaces/ai.interface';
 
 export function buildSummarizePrompt(
   content: string,
-  maxLength: SummarizeArticleRequest,
+  maxLength: SummaryLength,
 ): string {
   return `
     You are an expert summarization assistant.

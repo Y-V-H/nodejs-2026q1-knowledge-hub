@@ -1,6 +1,8 @@
+import { AnalyzeArticleType } from '../interfaces/ai.interface';
+
 export function buildAnalyzeArticlePrompt(
   content: string,
-  task: 'review' | 'bugs' | 'optimize' | 'explain',
+  task: AnalyzeArticleType,
 ) {
   return `
     You are an expert content analyst and reviewer.
@@ -44,10 +46,17 @@ export function buildAnalyzeArticlePrompt(
       - Use examples if helpful
 
     Output format:
-    - Be structured and easy to scan
-    - Use bullet points or sections when appropriate
-    - No explanations about the process
-    - No meta commentary
+      Return ONLY a valid JSON object with this exact structure (no markdown, no code blocks):
+      {
+        "analysis": "string with detailed analysis",
+        "suggestions": ["array", "of", "improvement", "suggestions"],
+        "severity": "info" | "warning" | "error"
+      }
+
+    Rules for severity:
+    - "info": no critical issues, just observations
+    - "warning": notable issues that should be addressed
+    - "error": serious problems requiring immediate attention
 
     Content:
     """
