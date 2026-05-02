@@ -31,6 +31,8 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@nestjs/axios": "^4.0.1",
     "@nestjs/common": "^11",
     "@nestjs/config": "^4.0.3",
     "@nestjs/core": "^11",
