@@ -1,5 +1,6 @@
+export type SummaryLength = 'short' | 'medium' | 'detailed';
 export interface SummarizeArticleRequest {
-  maxLength?: 'short' | 'medium' | 'detailed';
+  maxLength?: SummaryLength;
 }
 
 export interface SummarizeArticleResponse {
@@ -20,13 +21,15 @@ export interface TranslateArticleResponse {
   detectedLanguage: string;
 }
 
+export type AnalyzeArticleSeverity = 'info' | 'warning' | 'error';
+export type AnalyzeArticleType = 'review' | 'bugs' | 'optimize' | 'explain';
 export interface AnalyzeArticleRequest {
-  task?: 'review' | 'bugs' | 'optimize' | 'explain';
+  task?: AnalyzeArticleType;
 }
 
 export interface AnalyzeArticleResponse {
   articleId: string;
   analysis: string;
   suggestions: string[];
-  severity: 'info' | 'warning' | 'error';
+  severity: AnalyzeArticleSeverity;
 }
