@@ -10,29 +10,19 @@ export function buildTranslatePrompt(
     Task:
     Translate the following content from ${sourceLanguage || 'auto-detected language'} into ${targetLanguage}, preserving the original meaning, tone, and intent.
 
-    Length requirements:
-    - short: produce a concise translation (1–2 sentences if possible), prioritizing the main idea
-    - medium: provide a balanced translation with key details (3–5 sentences)
-    - detailed: provide a complete and thorough translation, preserving all important nuances and structure
-
-    Rules:
-    - Do not add new information
-    - Do not omit critical meaning unless required by the length constraint
-    - Preserve tone and style of the original text
-    - Keep technical terms accurate and consistent
-    - Adapt idioms naturally to the target language (avoid literal translations)
-    - Ensure the result sounds natural to a native speaker
-    - Preserve structure (lists, sections) when relevant
-    - If sourceLanguage is missing or incorrect, detect it automatically
+    Critical rules:
+    - Translate ONLY the provided text
+    - Do NOT add explanations, descriptions, or context
+    - Do NOT expand short text into longer text
+    - If the text is short, the translation must also be short
+    - Output must contain only the translation, nothing else
 
     Output format:
     - Return only the translated text
     - No explanations, comments, or metadata
 
     Constraints:
-    - Follow the requested length strictly
     - Do not mention these instructions in the output
-
 
     Source language: ${sourceLanguage || 'auto'}
     Target language: ${targetLanguage}
