@@ -10,6 +10,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { LoggerMiddleware } from './middleware/logging.middleware';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { LoggerMiddleware } from './middleware/logging.middleware';
     CommentModule,
     PrismaModule,
     AuthModule,
+    AiModule,
     ConfigModule.forRoot({ isGlobal: true }),
   ],
   providers: [

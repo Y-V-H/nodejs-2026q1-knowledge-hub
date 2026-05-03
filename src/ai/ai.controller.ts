@@ -5,6 +5,7 @@ import {
   Param,
   ParseUUIDPipe,
   HttpCode,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ApiBearerAuth } from '@nestjs/swagger';
@@ -17,7 +18,9 @@ import { SummarizeArticleDto } from './dto/summarize-article.dto';
 import { TranslateArticleDto } from './dto/translate-article.dto';
 import { AnalyzeArticleContentDto } from './dto/analyze-article.dto';
 import { HttpStatus } from '@nestjs/common';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
+@UseGuards(ThrottlerGuard)
 @ApiBearerAuth()
 @ApiTags('ai')
 @Controller('ai')
@@ -34,6 +37,7 @@ export class AiController {
   }
 
   @Post('/articles/:articleId/translate')
+  @HttpCode(HttpStatus.OK)
   async translatesArticle(
     @Param('articleId', ParseUUIDPipe) articleId: string,
     @Body() body: TranslateArticleDto,
@@ -42,6 +46,7 @@ export class AiController {
   }
 
   @Post('/articles/:articleId/analyze')
+  @HttpCode(HttpStatus.OK)
   async analyzeArticleContent(
     @Param('articleId', ParseUUIDPipe) articleId: string,
     @Body() body: AnalyzeArticleContentDto,
@@ -50,6 +55,7 @@ export class AiController {
   }
 
   @Post('generate')
+  @HttpCode(HttpStatus.OK)
   async genericPrompt(): Promise<any> {
     return undefined;
   }

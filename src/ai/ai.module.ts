@@ -4,9 +4,24 @@ import { GeminiService } from './services/gemini.service';
 import { AiService } from './services/ai.service';
 import { ArticleModule } from 'src/articles/article.module';
 import { AiController } from './ai.controller';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
-  imports: [HttpModule, ArticleModule],
+  imports: [
+    HttpModule,
+    ArticleModule,
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => [
+        {
+          ttl: 60000,
+          limit: Number(config.get<number>('AI_RATE_LIMIT_RPM')) ?? 20,
+        },
+      ],
+    }),
+  ],
   controllers: [AiController],
   providers: [GeminiService, AiService],
   exports: [],
