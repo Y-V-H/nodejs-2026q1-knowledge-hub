@@ -16,6 +16,7 @@ import {
 } from '../interfaces/ai.interface';
 import { InternalServerErrorException } from '@nestjs/common';
 import { AiCacheService } from './ai-cache.service';
+import { AiUsageService } from './ai-usage.service';
 
 @Injectable()
 export class AiService {
@@ -23,6 +24,7 @@ export class AiService {
     private readonly articleService: ArticleService,
     private readonly geminiService: GeminiService,
     private readonly aiCacheService: AiCacheService,
+    private readonly aiUsageService: AiUsageService,
   ) {}
 
   async generatesSummary(
@@ -36,7 +38,8 @@ export class AiService {
       return cachedData as SummarizeArticleResponse;
     }
     const prompt = buildSummarizePrompt(article.content, maxLength);
-    const { text } = await this.geminiService.generate(prompt);
+    const { text, usageMetadata } = await this.geminiService.generate(prompt);
+    this.aiUsageService.trackRequest('summarize', usageMetadata);
 
     const response = {
       articleId,
@@ -61,7 +64,8 @@ export class AiService {
       return cachedData as TranslateArticleResponse;
     }
     const prompt = buildTranslatePrompt(article.content, body);
-    const { text } = await this.geminiService.generate(prompt);
+    const { text, usageMetadata } = await this.geminiService.generate(prompt);
+    this.aiUsageService.trackRequest('summarize', usageMetadata);
 
     const response = {
       articleId,
@@ -96,5 +100,12 @@ export class AiService {
       suggestions: parsed.suggestions,
       severity: parsed.severity,
     };
+  }
+
+  async generic(prompt: string) {
+    const { text, usageMetadata } = await this.geminiService.generate(prompt);
+    this.aiUsageService.trackRequest('generate', usageMetadata);
+
+    return text;
   }
 }

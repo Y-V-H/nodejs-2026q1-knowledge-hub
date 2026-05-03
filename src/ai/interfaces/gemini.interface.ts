@@ -9,7 +9,7 @@ interface GeminiResponseCandidate {
   finishReason: string;
   index: number;
 }
-interface GeminiUsageMetadata {
+export interface GeminiUsageMetadata {
   promptTokenCount: number;
   candidatesTokenCount: number;
   totalTokenCount: number;
