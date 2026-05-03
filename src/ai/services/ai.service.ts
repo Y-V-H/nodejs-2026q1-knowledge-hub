@@ -15,12 +15,14 @@ import {
   TranslateArticleResponse,
 } from '../interfaces/ai.interface';
 import { InternalServerErrorException } from '@nestjs/common';
+import { AiCacheService } from './ai-cache.service';
 
 @Injectable()
 export class AiService {
   constructor(
     private readonly articleService: ArticleService,
     private readonly geminiService: GeminiService,
+    private readonly aiCacheService: AiCacheService,
   ) {}
 
   async generatesSummary(
@@ -28,15 +30,24 @@ export class AiService {
     maxLength: SummaryLength = 'medium',
   ): Promise<SummarizeArticleResponse> {
     const article = await this.articleService.getArticle(articleId);
+    const cacheKey = `summarize:${articleId}:${maxLength}:${article.updatedAt}`;
+    const cachedData = this.aiCacheService.get(cacheKey);
+    if (cachedData) {
+      return cachedData as SummarizeArticleResponse;
+    }
     const prompt = buildSummarizePrompt(article.content, maxLength);
     const { text } = await this.geminiService.generate(prompt);
 
-    return {
+    const response = {
       articleId,
       summary: text,
       originalLength: article.content.length,
       summaryLength: text.length,
     };
+
+    this.aiCacheService.set({ key: cacheKey, value: response });
+
+    return response;
   }
 
   async generateTranslation(
@@ -44,14 +55,23 @@ export class AiService {
     body: TranslateArticleRequest,
   ): Promise<TranslateArticleResponse> {
     const article = await this.articleService.getArticle(articleId);
+    const cacheKey = `translation:${articleId}:${body.sourceLanguage}:${body.targetLanguage}:${article.updatedAt}`;
+    const cachedData = this.aiCacheService.get(cacheKey);
+    if (cachedData) {
+      return cachedData as TranslateArticleResponse;
+    }
     const prompt = buildTranslatePrompt(article.content, body);
     const { text } = await this.geminiService.generate(prompt);
 
-    return {
+    const response = {
       articleId,
       translatedText: text,
       detectedLanguage: body.sourceLanguage ?? 'auto-detected',
     };
+
+    this.aiCacheService.set({ key: cacheKey, value: response });
+
+    return response;
   }
 
   async analyzeArticle(

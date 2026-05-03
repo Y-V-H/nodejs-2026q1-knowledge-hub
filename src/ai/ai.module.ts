@@ -6,6 +6,7 @@ import { ArticleModule } from 'src/articles/article.module';
 import { AiController } from './ai.controller';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AiCacheService } from './services/ai-cache.service';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
   ],
   controllers: [AiController],
-  providers: [GeminiService, AiService],
+  providers: [GeminiService, AiService, AiCacheService],
   exports: [],
 })
 export class AiModule {}
