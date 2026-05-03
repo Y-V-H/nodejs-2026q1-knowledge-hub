@@ -6,7 +6,7 @@ export const toSafeUser = (user: User): SafeUser => {
     id: user.id,
     login: user.login,
     role: user.role.toLowerCase() as Role,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
+    createdAt: new Date(user.createdAt).getTime(),
+    updatedAt: new Date(user.updatedAt).getTime(),
   };
 };

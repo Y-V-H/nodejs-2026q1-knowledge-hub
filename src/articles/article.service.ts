@@ -1,8 +1,5 @@
-import {
-  Injectable,
-  NotFoundException,
-  ForbiddenException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { NotFoundError, ForbiddenError } from 'src/errors';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import type { Article } from './interfaces/article.interface';
@@ -16,6 +13,14 @@ interface UpdateArticleProps {
   userId: string;
   userRole: Role;
 }
+
+const mapArticle = (article: any) => ({
+  ...article,
+  status: article.status.toLowerCase(),
+  tags: article.tags.map((t: any) => t.name),
+  createdAt: new Date(article.createdAt).getTime(),
+  updatedAt: new Date(article.updatedAt).getTime(),
+});
 
 @Injectable()
 export class ArticleService {
@@ -31,8 +36,10 @@ export class ArticleService {
       authorId,
     } = createArticleDto;
 
-    const article = await this.prisma.article.create({
-      data: {
+    const article = await this.prisma.article.upsert({
+      where: { title },
+      update: { content, status, categoryId, authorId },
+      create: {
         title,
         content,
         status,
@@ -48,7 +55,7 @@ export class ArticleService {
       include: { tags: true },
     });
 
-    return article;
+    return mapArticle(article);
   }
 
   async getAllArticles(
@@ -58,7 +65,7 @@ export class ArticleService {
   ): Promise<Article[]> {
     const where: Prisma.ArticleWhereInput = {};
 
-    if (status) where.status = status as Status;
+    if (status) where.status = status.toUpperCase() as Status;
     if (categoryId) where.categoryId = categoryId;
     if (tag) where.tags = { some: { name: tag } };
 
@@ -67,7 +74,7 @@ export class ArticleService {
       include: { tags: true },
     });
 
-    return articles;
+    return articles.map(mapArticle);
   }
 
   async getArticle(id: string) {
@@ -76,10 +83,10 @@ export class ArticleService {
       include: { tags: true },
     });
     if (!article) {
-      throw new NotFoundException('Article not found');
+      throw new NotFoundError('Article not found');
     }
 
-    return article;
+    return mapArticle(article);
   }
 
   async updateArticle({
@@ -90,42 +97,44 @@ export class ArticleService {
   }: UpdateArticleProps) {
     const article = await this.prisma.article.findUnique({ where: { id } });
     if (!article) {
-      throw new NotFoundException('Article not found');
+      throw new NotFoundError('Article not found');
     }
 
     if (userRole !== Role.ADMIN && article.authorId !== userId) {
-      throw new ForbiddenException('You can only edit your own articles');
+      throw new ForbiddenError('You can only edit your own articles');
     }
 
     const { tags, title, content, status, categoryId, authorId } =
       updateArticleDto;
 
-    return await this.prisma.article.update({
-      where: { id },
-      data: {
-        title,
-        content,
-        status,
-        categoryId,
-        authorId,
-        tags: tags
-          ? {
-              set: [],
-              connectOrCreate: tags.map((name) => ({
-                where: { name },
-                create: { name },
-              })),
-            }
-          : undefined,
-      },
-      include: { tags: true },
-    });
+    return mapArticle(
+      await this.prisma.article.update({
+        where: { id },
+        data: {
+          title,
+          content,
+          status,
+          categoryId,
+          authorId,
+          tags: tags
+            ? {
+                set: [],
+                connectOrCreate: tags.map((name) => ({
+                  where: { name },
+                  create: { name },
+                })),
+              }
+            : undefined,
+        },
+        include: { tags: true },
+      }),
+    );
   }
 
   async deleteArticle(id: string) {
     const article = await this.prisma.article.findUnique({ where: { id } });
     if (!article) {
-      throw new NotFoundException('Article not found');
+      throw new NotFoundError('Article not found');
     }
     await this.prisma.article.delete({ where: { id } });
   }

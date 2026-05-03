@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import type { Category } from './interfaces/category.interfaces';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotFoundError } from 'src/errors';
 
 @Injectable()
 export class CategoryService {
@@ -11,11 +12,11 @@ export class CategoryService {
   async createCategory(
     createCategoryDto: CreateCategoryDto,
   ): Promise<Category> {
-    const category = await this.prisma.category.create({
-      data: createCategoryDto,
+    return await this.prisma.category.upsert({
+      where: { name: createCategoryDto.name },
+      update: {},
+      create: createCategoryDto,
     });
-
-    return category;
   }
 
   async getAllCategories(): Promise<Category[]> {
@@ -25,7 +26,7 @@ export class CategoryService {
   async getCategory(id: string) {
     const category = await this.prisma.category.findUnique({ where: { id } });
     if (!category) {
-      throw new NotFoundException('Category not found');
+      throw new NotFoundError('Category not found');
     }
 
     return category;
@@ -34,7 +35,7 @@ export class CategoryService {
   async updateCategory(id: string, updateCategoryDto: UpdateCategoryDto) {
     const category = await this.prisma.category.findUnique({ where: { id } });
     if (!category) {
-      throw new NotFoundException('Category not found');
+      throw new NotFoundError('Category not found');
     }
 
     const updatedCategory = await this.prisma.category.update({
@@ -48,8 +49,13 @@ export class CategoryService {
   async deleteCategory(id: string) {
     const category = await this.prisma.category.findUnique({ where: { id } });
     if (!category) {
-      throw new NotFoundException('Category not found');
+      throw new NotFoundError('Category not found');
     }
+
+    await this.prisma.article.updateMany({
+      where: { categoryId: id },
+      data: { categoryId: null },
+    });
 
     await this.prisma.category.delete({ where: { id } });
   }

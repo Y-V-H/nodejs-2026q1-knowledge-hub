@@ -7,39 +7,36 @@ REST API for managing articles, categories, comments and users built with NestJS
 - Node.js >= 22.14.0
 - npm
 
-## How to run
 
+## Getting a Gemini API Key
+
+1. Go to https://aistudio.google.com/apikey
+2. Sign in with your Google account
+3. Click "Create API key"
+4. Copy the generated key — you'll need it in the next step
+
+### AI (powered by Google Gemini)
+
+All AI endpoints are protected by JWT and rate-limited (configurable via `AI_RATE_LIMIT_RPM`, default 20 RPM).
+
+- `POST /ai/articles/:articleId/summarize` - generate article summary
+- `POST /ai/articles/:articleId/translate` - translate article content
+- `POST /ai/articles/:articleId/analyze` - analyze article (review/bugs/optimize/explain)
+- `POST /ai/generate` - free-form prompt generation
+- `GET /ai/usage` - usage statistics (total requests, by endpoint, token counters)
+
+**Model used:** `gemini-2.5-flash` (configurable via `GEMINI_MODEL`)
+
+## How to run Docker Compose 
 1. Clone the repository
 2. Copy `.env.example` to `.env` and fill in the values
-3. Run `npm install`
-4. Run `npx prisma generate`
-5. Start the database: `docker compose up -d db`
-6. Run migrations: `npx prisma migrate deploy`
-7. Seed the database: `npx prisma db seed`
-8. Start the app: `docker compose up -d`
-9. Open Swagger: `http://localhost:4000/doc`
-
-## Environment Variables
-
-Create `.env` file in root directory:
-
-```
-PORT=4000
-```
-
-## Running the app
-
+3. Open `.env` and paste your Gemini API key:
+4. Start the application:
 ```bash
-npm start
+   docker compose up --build
 ```
+5. Open Swagger: `http://localhost:4000/doc`
 
-## API Documentation
-
-Swagger UI is available at:
-
-```
-http://localhost:4000/doc
-```
 
 ## Endpoints
 
