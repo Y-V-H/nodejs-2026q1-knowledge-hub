@@ -6,6 +6,7 @@ import {
   ParseUUIDPipe,
   HttpCode,
   UseGuards,
+  Get,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ApiBearerAuth } from '@nestjs/swagger';
@@ -18,14 +19,19 @@ import { SummarizeArticleDto } from './dto/summarize-article.dto';
 import { TranslateArticleDto } from './dto/translate-article.dto';
 import { AnalyzeArticleContentDto } from './dto/analyze-article.dto';
 import { HttpStatus } from '@nestjs/common';
-import { ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerGuard, SkipThrottle } from '@nestjs/throttler';
+import { AiUsageService } from './services/ai-usage.service';
+import { GenerateDto } from './dto/generate.dto';
 
 @UseGuards(ThrottlerGuard)
 @ApiBearerAuth()
 @ApiTags('ai')
 @Controller('ai')
 export class AiController {
-  constructor(private readonly aiService: AiService) {}
+  constructor(
+    private readonly aiService: AiService,
+    private readonly aiUsageService: AiUsageService,
+  ) {}
 
   @Post('/articles/:articleId/summarize')
   @HttpCode(HttpStatus.OK)
@@ -54,9 +60,18 @@ export class AiController {
     return await this.aiService.analyzeArticle(articleId, body.task);
   }
 
-  @Post('generate')
+  @Post('/generate')
   @HttpCode(HttpStatus.OK)
-  async genericPrompt(): Promise<any> {
-    return undefined;
+  async genericPrompt(@Body() body: GenerateDto) {
+    const text = await this.aiService.generic(body.prompt);
+
+    return { text };
+  }
+
+  @Get('/usage')
+  @SkipThrottle()
+  @HttpCode(HttpStatus.OK)
+  getUsage() {
+    return this.aiUsageService.getStats();
   }
 }
