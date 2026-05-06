@@ -1,8 +1,5 @@
-import {
-  Injectable,
-  NotFoundException,
-  ForbiddenException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { NotFoundError, ForbiddenError } from 'src/errors';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import type { Article } from './interfaces/article.interface';
@@ -86,7 +83,7 @@ export class ArticleService {
       include: { tags: true },
     });
     if (!article) {
-      throw new NotFoundException('Article not found');
+      throw new NotFoundError('Article not found');
     }
 
     return mapArticle(article);
@@ -100,11 +97,11 @@ export class ArticleService {
   }: UpdateArticleProps) {
     const article = await this.prisma.article.findUnique({ where: { id } });
     if (!article) {
-      throw new NotFoundException('Article not found');
+      throw new NotFoundError('Article not found');
     }
 
     if (userRole !== Role.ADMIN && article.authorId !== userId) {
-      throw new ForbiddenException('You can only edit your own articles');
+      throw new ForbiddenError('You can only edit your own articles');
     }
 
     const { tags, title, content, status, categoryId, authorId } =
@@ -137,7 +134,7 @@ export class ArticleService {
   async deleteArticle(id: string) {
     const article = await this.prisma.article.findUnique({ where: { id } });
     if (!article) {
-      throw new NotFoundException('Article not found');
+      throw new NotFoundError('Article not found');
     }
     await this.prisma.article.delete({ where: { id } });
   }

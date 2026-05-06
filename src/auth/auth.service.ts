@@ -1,11 +1,8 @@
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import {
-  Injectable,
-  BadRequestException,
-  ForbiddenException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { ValidationError, ForbiddenError } from 'src/errors';
 import { Role } from 'generated/prisma';
 import { SignUpDto } from './dto/signup.dto';
 import { UsersService } from 'src/users/users.service';
@@ -47,13 +44,13 @@ export class AuthService {
     const user = await this.usersService.findByLogin(login);
 
     if (!user) {
-      throw new ForbiddenException('User not found');
+      throw new ForbiddenError('User not found');
     }
 
     const isMatch = await bcrypt.compare(password, user?.password);
 
     if (!isMatch) {
-      throw new ForbiddenException('Data is not correct');
+      throw new ForbiddenError('Data is not correct');
     }
 
     const { accessToken, refreshToken } = await this.generateTokens({
@@ -124,7 +121,7 @@ export class AuthService {
         return { accessToken, refreshToken };
       }
     } catch {
-      throw new ForbiddenException('Refresh token is invalid or expired');
+      throw new ForbiddenError('Refresh token is invalid or expired');
     }
   }
 
