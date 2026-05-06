@@ -16,7 +16,7 @@ WORKDIR /app
 COPY --from=build /app/package.json /app/package-lock.json /app/
 COPY --from=build /app/dist /app/dist
 COPY --from=build /app/generated /app/dist/generated
-RUN npm ci --omit=dev
+RUN npm install --omit=dev
 RUN apk add --no-cache curl
 
 RUN adduser -D mobydick

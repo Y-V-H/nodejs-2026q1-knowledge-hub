@@ -1,4 +1,5 @@
 import { IsString, IsNotEmpty, IsUUID, IsOptional } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCommentDto {
@@ -17,6 +18,7 @@ export class CreateCommentDto {
 
   @ApiProperty({ description: 'Author ID', required: false })
   @IsOptional()
+  @Transform(({ value }) => (value === null ? null : value))
   @IsUUID()
   readonly authorId?: string;
 }

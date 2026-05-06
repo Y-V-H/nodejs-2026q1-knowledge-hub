@@ -38,6 +38,7 @@ export class CreateArticleDto {
   })
   @IsOptional()
   @IsEnum(Status)
+  @Transform(({ value }) => value?.toUpperCase())
   readonly status?: Status;
 
   @ApiProperty({
@@ -48,6 +49,7 @@ export class CreateArticleDto {
   @IsOptional()
   @IsString()
   @IsUUID()
+  @Transform(({ value }) => value ?? undefined)
   readonly categoryId?: string;
 
   @ApiProperty({
@@ -58,6 +60,7 @@ export class CreateArticleDto {
   @IsOptional()
   @IsString()
   @IsUUID()
+  @Transform(({ value }) => value ?? undefined)
   readonly authorId: string;
 
   @ApiProperty({
