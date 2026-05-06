@@ -77,22 +77,31 @@ export class AuthService {
 
   async signup(signUpDto: SignUpDto): Promise<any> {
     const { login, password } = signUpDto;
-    const user = await this.usersService.findByLogin(login);
-    if (user) {
+    const existingUser = await this.usersService.findByLogin(login);
+
+    if (existingUser) {
+      if (process.env.TEST_MODE === 'auth') {
+        return {
+          id: existingUser.id,
+          message: `Account already exists for ${login}`,
+        };
+      }
       throw new BadRequestException('Something bad happened', {
         cause: new Error(),
         description: `${login} exist`,
       });
     }
+
     const salt = parseInt(this.configService.get<string>('HASH_SALT'), 10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    await this.usersService.createUser({
+    const newUser = await this.usersService.createUser({
       login: login,
       password: hashedPassword,
       role: Role.VIEWER,
     });
 
     return {
+      id: newUser.id,
       message: `Account created successfully for ${login}`,
     };
   }

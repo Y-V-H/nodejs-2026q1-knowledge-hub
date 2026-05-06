@@ -5,8 +5,8 @@ export interface User {
   login: string;
   password: string;
   role: Role;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: number;
+  updatedAt: number;
 }
 
 export interface SafeUser extends Omit<User, 'password'> {}
