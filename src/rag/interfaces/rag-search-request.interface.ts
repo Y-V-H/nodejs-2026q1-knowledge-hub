@@ -1,7 +1,9 @@
+import { Status } from '../../../generated/prisma';
+
 export interface RagSearchRequest {
   query: string;
   limit?: number;
-  articleStatus?: 'draft' | 'published' | 'archived';
+  articleStatus?: Status;
   categoryId?: string;
   tags?: string[];
 }
