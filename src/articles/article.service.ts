@@ -138,4 +138,24 @@ export class ArticleService {
     }
     await this.prisma.article.delete({ where: { id } });
   }
+
+  async findForIndexing(opts: {
+    onlyPublished: boolean;
+    articleIds?: string[];
+  }) {
+    return this.prisma.article.findMany({
+      where: {
+        ...(opts.onlyPublished && { status: 'PUBLISHED' }),
+        ...(opts.articleIds?.length && { id: { in: opts.articleIds } }),
+      },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        status: true,
+        categoryId: true,
+        tags: { select: { name: true } },
+      },
+    });
+  }
 }
