@@ -26,6 +26,6 @@ import { AiUsageService } from './services/ai-usage.service';
   ],
   controllers: [AiController],
   providers: [GeminiService, AiService, AiCacheService, AiUsageService],
-  exports: [],
+  exports: [GeminiService, AiService],
 })
 export class AiModule {}
