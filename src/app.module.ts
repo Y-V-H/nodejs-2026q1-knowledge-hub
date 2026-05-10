@@ -11,6 +11,7 @@ import { AuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { LoggerMiddleware } from './middleware/logging.middleware';
 import { AiModule } from './ai/ai.module';
+import { RagModule } from './rag/rag.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AiModule } from './ai/ai.module';
     AuthModule,
     AiModule,
     ConfigModule.forRoot({ isGlobal: true }),
+    RagModule,
   ],
   providers: [
     {

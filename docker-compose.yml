@@ -9,25 +9,28 @@ services:
   # Development Service
   # ========================================
   app:
-    environment:
-      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public"
     build:
       context: .
       dockerfile: ./Dockerfile  # I know it's not necessary, but let's leave it for learning purposes.
     container_name: knowledge-hub
+    environment:
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public"
     depends_on:
       db:
+        condition: service_healthy
+      vectordb:
         condition: service_healthy
     ports:
       - '${PORT:-4000}:4000'
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:4000/user || exit 1"]
+      # test: ["CMD-SHELL", "curl -f http://localhost:4000/auth || exit 1"]
+      test: ["CMD-SHELL", "node -e \"fetch('http://localhost:4000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""] # check new approach 
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 5s
+      start_period: 10s
     env_file: .env
-    restart: on-failure
+    restart: unless-stopped
     networks:
       - knowledge-network
 
@@ -51,6 +54,26 @@ services:
     restart: unless-stopped
     networks:
       - knowledge-network
+    
+  vectordb:
+    image: qdrant/qdrant:v1.17.1
+    container_name: qdrant
+    env_file: .env
+    ports:
+      - '127.0.0.1:6333:6333'  # for dev period
+    volumes:
+      - qdrant_data:/qdrant/storage
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/6333'"]
+      # test: ["CMD-SHELL", "curl -f http://localhost:6333/healthz || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - knowledge-network
+
 
   # ========================================
   # Adminer
@@ -71,6 +94,7 @@ services:
   
 volumes:
   postgres_data:
+  qdrant_data:
 networks:
   knowledge-network:
 

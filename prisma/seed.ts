@@ -96,17 +96,19 @@ async function main() {
   // Article
   const articles: Article[] = [
     {
-      title: 'First Post',
-      content: 'Hello world article',
+      title: 'Elliott Erwitt',
+      content:
+        'Elliott Erwitt is a much lauded and supremely accomplished photographer known for his drily perceptive and witty pictures. But when he first picked up a camera, at the age of fifteen, he was a shy and earnest young man struggling to confront and observe the world with emotion and humility. Nevertheless, his early work, though tentative, contains the seeds of all of his subsequent photographs. This essay traces the development of Erwitt’s rich and varied personal vision from the mid-1940s to 1957, when he reached the level of artistic maturity that continues to distinguish his photographs today.',
       status: Status.PUBLISHED,
       authorId: createdUsers[0].id,
       categoryId: createdCategories[0].id,
       tags: [createdTags[0].name, createdTags[4].name],
     },
     {
-      title: 'Prisma Guide',
-      content: 'Intro to Prisma ORM',
-      status: Status.DRAFT,
+      title: 'Canon AV-1',
+      content:
+        'Even though the camera would cost more, shutter speed-priority AE cameras were important to Canon since users could comprehend shutter speeds easier than aperture settings. However, in America and other overseas markets, aperture-priority AE 35mm cameras were in the majority.',
+      status: Status.PUBLISHED,
       authorId: createdUsers[1].id,
       categoryId: createdCategories[1].id,
       tags: [createdTags[1].name, createdTags[3].name],
