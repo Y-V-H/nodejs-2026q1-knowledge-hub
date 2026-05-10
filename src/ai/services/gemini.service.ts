@@ -20,6 +20,7 @@ export class GeminiService {
   private readonly apiUrl: string;
   private readonly model: string;
   private readonly MAX_RETRIES = 3;
+  private readonly embedModel: string;
 
   constructor(
     private readonly httpService: HttpService,
@@ -28,6 +29,9 @@ export class GeminiService {
     this.apiKey = this.configService.get<string>('GEMINI_API_KEY');
     this.apiUrl = this.configService.get<string>('GEMINI_API_BASE_URL');
     this.model = this.configService.get<string>('GEMINI_MODEL');
+    this.embedModel = this.configService.getOrThrow<string>(
+      'GEMINI_EMBEDDING_MODEL',
+    );
   }
 
   async generate(prompt: string): Promise<GeminiGenerateResult> {
@@ -47,19 +51,60 @@ export class GeminiService {
       ],
     };
 
+    const response = await this.requestWithRetry<GeminiResponse>(url, body);
+    return {
+      text: response.candidates[0].content.parts[0].text,
+      usageMetadata: response.usageMetadata,
+    };
+  }
+
+  async embedContent(
+    text: string,
+    taskType: 'RETRIEVAL_DOCUMENT' | 'RETRIEVAL_QUERY',
+  ): Promise<number[]> {
+    const url = `${this.apiUrl}/v1beta/models/${this.embedModel}:embedContent`;
+    const body = {
+      content: { parts: [{ text }] },
+      taskType,
+      outputDimensionality: 768,
+    };
+    const data = await this.requestWithRetry<{
+      embedding: { values: number[] };
+    }>(url, body);
+    return data.embedding.values;
+  }
+
+  async batchEmbedContents(texts: string[], taskType): Promise<number[][]> {
+    if (texts.length === 0) return [];
+
+    const url = `${this.apiUrl}/v1beta/models/${this.embedModel}:batchEmbedContents`;
+
+    const body = {
+      requests: texts.map((text) => ({
+        model: `models/${this.embedModel}`,
+        content: { parts: [{ text }] },
+        taskType,
+        outputDimensionality: 768,
+      })),
+    };
+
+    console.log('URL:', url);
+    console.log('Body:', JSON.stringify(body, null, 2));
+    const data = await this.requestWithRetry<{
+      embeddings: { values: number[] }[];
+    }>(url, body);
+    return data.embeddings.map((e) => e.values);
+  }
+
+  private async requestWithRetry<T>(url: string, body: unknown): Promise<T> {
+    const headers = { 'x-goog-api-key': this.apiKey };
+
     for (let attempt = 0; attempt <= this.MAX_RETRIES; attempt++) {
       try {
         const response = await firstValueFrom(
-          this.httpService.post<GeminiResponse>(url, body, {
-            headers: headersRequest,
-            timeout: 30000,
-          }),
+          this.httpService.post<T>(url, body, { headers, timeout: 30000 }),
         );
-
-        return {
-          text: response.data.candidates[0].content.parts[0].text,
-          usageMetadata: response.data.usageMetadata,
-        };
+        return response.data;
       } catch (error) {
         const axiosError = error as AxiosError;
         const status = axiosError.response?.status;
@@ -91,7 +136,6 @@ export class GeminiService {
         );
       }
     }
-
     throw new ServiceUnavailableException(
       'AI service is currently unavailable',
     );
